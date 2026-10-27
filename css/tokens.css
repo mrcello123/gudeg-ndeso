@@ -1,0 +1,67 @@
+/* Design tokens for Gudeg Ndeso.
+   The Figma file defines no variables or styles, so these are derived from the raw
+   values used across the 8 "Venture" frames. */
+:root {
+  /* Brand */
+  --color-brown-900: #4b2513;   /* headings, section bars */
+  --color-brown-700: #673c27;   /* primary buttons, gradient start */
+  --color-brown-400: #cd774e;   /* accent, gradient end */
+  --color-brown-300: #c49e8b;   /* soft buttons, steppers */
+  --color-brown-300b: #c39e8b;  /* checkout buttons (near-duplicate in Figma) */
+  --color-brown-300-16: rgb(195 158 139 / 0.16);
+  --gradient-brand: linear-gradient(to right, var(--color-brown-700), var(--color-brown-400));
+
+  /* Surfaces */
+  --color-white: #ffffff;
+  --color-surface-50: #fefefe;
+  --color-surface-100: #fcfcfc;
+  --color-surface-200: #f9f9f9;
+  --color-surface-300: #f6f6f6;
+  --color-surface-400: #f4f4f4;
+  --color-surface-500: #ededed;
+  --color-surface-600: #d9d9d9;
+
+  /* Text */
+  --color-text: #000000;
+  --color-text-muted: #5e5e5e;
+  --color-text-subtle: #787878;
+  --color-text-placeholder: #9d9d9d;
+  --color-text-disabled: #b9b9b9;
+
+  /* Borders */
+  --color-border: #dedede;
+  --color-border-light: #ececec;
+  --color-border-mid: #dbdbdb;
+  --color-border-strong: #8d8d8d;
+
+  /* Status */
+  --color-danger: #ac1c1c;
+  --color-success: #4e872f;
+
+  /* Typography */
+  --font-display: "Poppins", sans-serif;
+  --font-body: "REM", sans-serif;
+  --font-ui: "Inter", sans-serif;
+  --font-caption: "Be Vietnam Pro", sans-serif;
+  --font-logo: "Chonburi", "Georgia", serif; /* stand-in for the logo artwork */
+
+  /* Radii */
+  --radius-xs: 3px; --radius-sm: 5px; --radius-md: 7px; --radius-btn: 8px;
+  --radius-lg: 9px; --radius-xl: 14px; --radius-card: 21px; --radius-card-lg: 25px;
+  --radius-sheet: 60px; --radius-pill: 25px;
+
+  /* Layout */
+  --screen-w: 402px;
+  --header-h: 74px;
+
+  /* Elevation (Figma stacks several soft shadows per level) */
+  --shadow-card:
+    0 4px 8px rgb(0 0 0 / .04), 0 14px 14px rgb(0 0 0 / .03),
+    0 33px 20px rgb(0 0 0 / .02), 0 58px 23px rgb(0 0 0 / .01);
+  --shadow-sm:
+    0 3px 6px rgb(0 0 0 / .03), 0 11px 11px rgb(0 0 0 / .03),
+    0 25px 15px rgb(0 0 0 / .02);
+  --shadow-sheet-top:
+    0 -4px 9px rgb(0 0 0 / .05), 0 -17px 17px rgb(0 0 0 / .04),
+    0 -38px 23px rgb(0 0 0 / .03), 0 -68px 27px rgb(0 0 0 / .01);
+}
