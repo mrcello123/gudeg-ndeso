@@ -1,7 +1,7 @@
 // Fill these in to switch from the built-in demo data to your Supabase project.
 // Use the publishable (anon) key only. Never put the secret / service_role key in front-end code.
-export const SUPABASE_URL = 'https://mmipvzvgfuazrflxfpiu.supabase.co';
-export const SUPABASE_ANON_KEY = 'sb_publishable_v4bsfzC9NhgS1N1jMoClYQ_w0cEZ4Xy';   // publishable key: safe in the browser because of RLS + grants
+export const SUPABASE_URL = '';
+export const SUPABASE_ANON_KEY = '';   // publishable key: safe in the browser because of RLS + grants
 
 // If a table/column in your database is named differently, change it here (see data.js).
 export const SCHEMA = {
