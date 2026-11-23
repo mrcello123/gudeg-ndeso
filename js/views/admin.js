@@ -1,7 +1,6 @@
 import { isLive, listStock, addItem, updateItem, adjustStock, subscribeStock, stockState, listOrders, subscribeOrders } from '../data.js';
 import { icons } from '../icons.js';
 import { currentAdmin, login, logout } from '../auth.js';
-import { isLive, listStock, updateItem, adjustStock, subscribeStock, stockState, listOrders, subscribeOrders } from '../data.js';
 import { SERVICES } from '../icons.js';
 import { esc, toast, rupiah } from '../ui.js';
 
