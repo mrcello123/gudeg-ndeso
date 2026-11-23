@@ -382,3 +382,14 @@ body { background: #fff; }
   .food-card, .service, .package-card { transition: none; }
   .food-card:hover, .service:hover, .package-card:hover { transform: none; }
 }
+
+/* ---------- Admin: add menu ---------- */
+.adm-add { margin: 14px 34px 0; background: var(--color-surface-400); border-radius: var(--radius-lg); }
+.adm-add summary { padding: 12px 14px; font: 600 12px/1 var(--font-body); color: var(--color-brown-700); cursor: pointer; list-style: none; }
+.adm-add summary::-webkit-details-marker { display: none; }
+.adm-add form { padding: 0 14px 16px; }
+.adm-add label { display: block; margin-top: 10px; font: 400 11px/normal var(--font-body); color: var(--color-text-muted); }
+.adm-add input, .adm-add select { display: block; width: 100%; height: 36px; margin-top: 5px; padding: 0 14px; border: 0; border-radius: var(--radius-card-lg); background: #fff; font: 400 12px/36px var(--font-body); color: #000; }
+.adm-add__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.adm-add .btn { margin-top: 12px; }
+@media (min-width: 720px) { .adm-add { margin-left: 34px; margin-right: 34px; } }
