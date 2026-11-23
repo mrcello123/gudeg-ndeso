@@ -38,7 +38,9 @@ const iso = (t) => new Date(t).toISOString();
 let menuCache = null, menuAt = 0;
 const LS_STOCK = 'gudeg.stock';   // demo mode: { [id]: { stock, available } } overrides
 const loadStock = () => JSON.parse(localStorage.getItem(LS_STOCK) || '{}');
-const demoItems = () => { const o = loadStock(); return DEMO_ITEMS.map((i) => ({ ...i, low: DEFAULT_LOW_STOCK, available: true, ...(o[i.id] || {}) })); };
+const LS_CUSTOM = 'gudeg.custom';   // demo mode: menu items added by the admin
+const loadCustom = () => JSON.parse(localStorage.getItem(LS_CUSTOM) || '[]');
+const demoItems = () => { const o = loadStock(); return [...DEMO_ITEMS, ...loadCustom()].map((i) => ({ ...i, low: DEFAULT_LOW_STOCK, available: true, ...(o[i.id] || {}) })); };
 
 /** 'off' | 'untracked' | 'out' | 'low' | 'ok' */
 export function stockState(i) {
@@ -105,6 +107,33 @@ export async function listStock() {
     rows = data.map(normRow);
   }
   return rows.filter((i) => i.category !== 'package').sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** Admin: create a new food/drink. stock = null means "not tracked" (unlimited). Returns the created item. */
+export async function addItem({ name, price, category, image, description, stock }) {
+  name = String(name || '').trim(); description = String(description || '').trim(); image = String(image || '').trim();
+  if (name.length < 2 || name.length > 60) throw new Error('Nama menu 2–60 karakter.');
+  if (!Number.isInteger(price) || price < 0 || price > 10_000_000) throw new Error('Harga harus berupa angka bulat.');
+  if (!['food', 'drink'].includes(category)) throw new Error('Pilih kategori.');
+  if (stock != null && (!Number.isInteger(stock) || stock < 0)) throw new Error('Stok harus angka 0 atau lebih.');
+  if (image && !/^(https:\/\/|assets\/)/.test(image)) throw new Error('Link gambar harus diawali https:// atau assets/');
+  image = image || (category === 'drink' ? 'assets/es-teh.svg' : 'assets/nasi-putih.svg');
+  menuCache = null;
+
+  if (!isLive) {
+    const all = demoItems();
+    if (all.some((i) => i.name.toLowerCase() === name.toLowerCase())) throw new Error('Nama menu sudah ada.');
+    const item = { id: `custom-${Date.now().toString(36)}`, name, price, category, image, description, stock: stock ?? null };
+    localStorage.setItem(LS_CUSTOM, JSON.stringify([...loadCustom(), item]));
+    return { ...item, low: DEFAULT_LOW_STOCK, available: true };
+  }
+  const db = await client(), m = S.menuItems, c = m.cols;
+  const { data, error } = await db.from(m.table).insert({
+    [c.name]: name, [c.price]: price, [c.category]: m.categoryValues[category], [c.image]: image,
+    [c.description]: description || null, [c.stock]: stock, [c.available]: true,
+  }).select().single();
+  if (error) throw new Error(error.code === '42501' ? 'Tidak diizinkan (bukan admin?)' : error.message);
+  return normRow(data);
 }
 
 /** patch: { stock?: number|null, available?: boolean } */
