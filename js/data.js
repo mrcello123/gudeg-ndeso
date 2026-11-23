@@ -307,6 +307,20 @@ export function subscribeOrders(cb) {
   return () => { stop = true; clearInterval(timer); window.removeEventListener('storage', onStorage); if (channel) sb.removeChannel(channel); };
 }
 
+/** Is the "click to simulate payment" button allowed? Live mode: only when the database switch app_settings.demo_payments = 'on'. */
+export async function demoPayEnabled() {
+  if (!isLive) return true;
+  const db = await client();
+  const { data, error } = await db.rpc('demo_payments_enabled');
+  return !error && data === true;
+}
+export async function demoPay(id) {
+  if (!isLive) return demoMarkPaid(id);
+  const db = await client();
+  const { error } = await db.rpc('demo_mark_paid', { p_id: id, p_ready_minutes: PICKUP_ESTIMATE_MINUTES });
+  if (error) throw error;
+}
+
 /** Demo only: marks an order as paid (in production your payment webhook does this). */
 export function demoMarkPaid(id) {
   const all = loadOrders();
