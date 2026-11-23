@@ -1,6 +1,6 @@
-import { getOrder, subscribeOrder, demoMarkPaid, isLive } from '../data.js';
+import { getOrder, subscribeOrder, demoPayEnabled, demoPay } from '../data.js';
 import { PAYMENT } from '../config.js';
-import { rupiah, esc, hhmmss } from '../ui.js';
+import { rupiah, esc, hhmmss, toast } from '../ui.js';
 
 export async function pay(root, { method, id }) {
   const o = await getOrder(id);
@@ -13,17 +13,27 @@ export async function pay(root, { method, id }) {
     <section class="pay">
       <h2>${isQris ? 'Scan Me' : 'Transfer ke'}</h2>
       ${isQris
-        // Placeholder QR. Replace with the QRIS payload/image returned by your payment provider.
-        ? '<img class="pay__qr" src="assets/qris-placeholder.svg" alt="Kode QRIS">'
+        // Change the file name here if your real QRIS image is not assets/qris-placeholder.svg
+        ? `<img class="pay__qr" src="assets/qris-placeholder.svg" alt="Kode QRIS"><div class="pay__bank">Nominal: <strong>${rupiah(o.total)}</strong><br>Kode pesanan: <strong>${esc(o.code)}</strong></div>`
         : `<div class="pay__bank">Bank BCA<b>${esc(PAYMENT.bca.account)}</b>a.n. ${esc(PAYMENT.bca.holder)}<br>Nominal: <strong>${rupiah(o.total)}</strong></div>`}
       <p class="pay__timer" id="t">${left()}</p>
-      ${isLive ? '' : '<button class="pay__dev" id="dev">Simulasi: tandai sudah dibayar (demo)</button>'}
     </section>`;
 
   const t = root.querySelector('#t');
   const timer = setInterval(() => { t.textContent = left(); }, 1000);
   const go = () => { location.hash = `#/order/${id}`; };
   const stop = subscribeOrder(id, (cur) => { if (cur.status === 'paid') go(); });
-  root.addEventListener('click', (e) => { if (e.target.closest('#dev')) { demoMarkPaid(id); go(); } });
-  return () => { clearInterval(timer); stop(); };
+
+  // "Click to pay" demo button: shown only while demo payments are switched on (always in demo mode).
+  let gone = false;
+  demoPayEnabled().then((on) => {
+    if (!on || gone) return;
+    root.querySelector('.pay').insertAdjacentHTML('beforeend', '<button class="pay__dev" id="dev">Simulasi: tandai sudah dibayar (demo)</button>');
+  }).catch(() => {});
+  root.addEventListener('click', async (e) => {
+    const b = e.target.closest('#dev'); if (!b) return;
+    b.disabled = true;
+    try { await demoPay(id); go(); } catch (x) { console.error(x); toast('Simulasi pembayaran dimatikan.'); b.disabled = false; }
+  });
+  return () => { gone = true; clearInterval(timer); stop(); };
 }
