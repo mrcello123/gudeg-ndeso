@@ -1,3 +1,4 @@
+import { isLive, listStock, addItem, updateItem, adjustStock, subscribeStock, stockState, listOrders, subscribeOrders } from '../data.js';
 import { icons } from '../icons.js';
 import { currentAdmin, login, logout } from '../auth.js';
 import { isLive, listStock, updateItem, adjustStock, subscribeStock, stockState, listOrders, subscribeOrders } from '../data.js';
@@ -50,6 +51,23 @@ export async function adminDashboard(root) {
     <div class="pill"><span>Dasbor Stok</span></div>
     ${adminNav('stock')}
     <div class="adm-user"><span>${esc(admin.email)}</span><button id="out" type="button">Keluar</button></div>
+        <details class="adm-add" id="add">
+      <summary>+ Tambah Menu</summary>
+      <form id="addf" novalidate>
+        <label>Nama menu<input name="name" maxlength="60" autocomplete="off" required></label>
+        <div class="adm-add__row">
+          <label>Harga (Rp)<input name="price" inputmode="numeric" pattern="[0-9]*" placeholder="8000" required></label>
+          <label>Kategori<select name="category"><option value="food">Makanan</option><option value="drink">Minuman</option></select></label>
+        </div>
+        <div class="adm-add__row">
+          <label>Stok awal<input name="stock" inputmode="numeric" pattern="[0-9]*" placeholder="Kosong = tak terbatas"></label>
+          <label>Link gambar (opsional)<input name="image" placeholder="https://… atau assets/…"></label>
+        </div>
+        <label>Deskripsi (opsional)<input name="description" maxlength="200" autocomplete="off"></label>
+        <p class="modal__err" role="alert"></p>
+        <button class="btn" type="submit">Simpan Menu</button>
+      </form>
+    </details>
     <div class="adm-stats" id="stats"></div>
     <div class="adm-tools">
       <input id="q" type="search" placeholder="Cari menu…" aria-label="Cari menu" autocomplete="off">
@@ -58,6 +76,20 @@ export async function adminDashboard(root) {
     <div class="adm-list" id="list"></div>
     <p class="adm-sync" id="sync"></p>`;
   const $l = root.querySelector('#list'), $s = root.querySelector('#stats'), $sync = root.querySelector('#sync');
+  
+  const addf = root.querySelector('#addf'), addErr = addf.querySelector('.modal__err'), addBtn = addf.querySelector('.btn');
+  addf.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(addf)), num = (v) => (String(v).trim() === '' ? null : Number(v));
+    addBtn.disabled = true; addErr.textContent = '';
+    try {
+      const item = await addItem({ name: f.name, price: num(f.price) ?? NaN, category: f.category, image: f.image, description: f.description, stock: num(f.stock) });
+      items = [...items, item]; query = ''; filter = 'all'; root.querySelector('#q').value = '';
+      root.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c.dataset.f === 'all')));
+      refreshAll(); addf.reset(); root.querySelector('#add').open = false; toast(`${item.name} ditambahkan`);
+    } catch (x) { addErr.textContent = x.message; }
+    addBtn.disabled = false;
+  });
 
   const row = (i) => {
     const s = stockState(i), n = esc(i.name);
